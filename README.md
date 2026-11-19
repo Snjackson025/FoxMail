@@ -45,7 +45,26 @@ It runs on the Muse TypeScript space runtime (`space.json`, Bun). The
 bun install
 bun run typecheck
 bun run build
+bun run api:check
 ```
+
+## API workflow
+
+The API is the typed action layer in `server/src/actions.ts`, called from
+`client/src/api.ts` via `POST ./actions { action, args }`. See
+[`docs/API.md`](docs/API.md) for every action, its request and response.
+
+GitHub Actions (`.github/workflows/api.yml`) runs on pushes and pull
+requests to `main`:
+
+- **API contract** — `node scripts/api-workflow-check.mjs` checks all
+  actions exist, `listAccounts` never exposes a password, the database
+  tables exist, and the client and migrations are in sync. No install
+  or database needed.
+- **Typecheck and build** — `bun install`, `bun run typecheck`,
+  `bun run build`. This job is currently best-effort on GitHub because
+  `@hatch/space-sdk` is a local file dependency of the Muse runtime —
+  see `docs/API.md` for details.
 
 ## Status
 
