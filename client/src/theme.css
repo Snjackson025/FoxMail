@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@import "tailwindcss-safe-area";
+@theme {
+  --text-xs: 12px; --text-xs--line-height: 16px;
+  --text-sm: 14px; --text-sm--line-height: 20px;
+  --text-base: 16px; --text-base--line-height: 24px;
+  --text-lg: 18px; --text-lg--line-height: 28px;
+  --text-xl: 20px; --text-xl--line-height: 28px;
+  --text-2xl: 24px; --text-2xl--line-height: 32px;
+}
+:root {
+  color-scheme: light dark;
+  --bg: #F5F5F4; --surface: #FFFFFF; --surface2: #FAFAF9;
+  --text: #1C1917; --dim: #78716C; --border: #E7E5E4;
+  --accent: #EA580C; --accent-text: #FFFFFF;
+  --work: #334155; --personal: #0F766E;
+  --radius: 10px;
+  --space-surface: var(--surface); --space-surface-alt: var(--surface2);
+  --space-muted: var(--dim); --space-border: var(--border); --space-accent: var(--accent);
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #0C0A09; --surface: #1C1917; --surface2: #292524; --text: #F5F5F4; --dim: #A8A29E; --border: #292524; --accent: #F97316; --work: #94A3B8; --personal: #2DD4BF; }
+}
+@layer base { button, [role="button"], select, summary, input:not([type="checkbox"],[type="radio"]) { min-height: 2rem; } }
