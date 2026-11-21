@@ -7,7 +7,6 @@ import { api, type ApiResponse } from "./api";
 
 const FIELDS = actionFields<typeof Actions>();
 type Message = ApiResponse<typeof api, "listMessages">["messages"][number];
-type CalEvent = ApiResponse<typeof api, "listEvents">["events"][number];
 type Folder = "inbox" | "starred" | "sent" | "drafts" | "archive" | "junk" | "trash";
 type CatFilter = "all" | "work" | "personal" | "professional";
 type Cat = "work" | "personal" | "professional";
@@ -150,7 +149,7 @@ export function App() {
   const [avatarBusy, setAvatarBusy] = useState(false);
   const uploadAvatarMut = useMutation({ mutationFn: async (args: { accountId: number; dataBase64: string; mimeType: string }) => await api.uploadAvatar(args), onSuccess: invalidate });
   const removeAvatarMut = useMutation({ mutationFn: (accountId: number) => api.removeAvatar({ accountId }), onSuccess: invalidate });
-  const handleAvatarFile = async (accountId: number | null, file: File | undefined, isNewAccount: boolean) => {
+  const handleAvatarFile = async (accountId: number | null, file: File | undefined) => {
     if (!file) return;
     if (!accountId) { setAccountError("Please save the account first, then add its profile picture here in Settings."); return; }
     setAvatarBusy(true);
@@ -173,11 +172,6 @@ export function App() {
     },
   });
 
-  const countFor = (f: Folder, cat: CatFilter = catFilter) => {
-    const counts = countsQ.data?.counts ?? [];
-    if (f === "starred") return messages.filter(m => m.isStarred).length && cat === "all" ? counts.reduce((s, c) => s, 0) : 0;
-    return counts.filter(c => c.folder === f && (cat === "all" || c.category === cat)).reduce((s, c) => s + c.total, 0);
-  };
   const unreadFor = (f: Folder) => (countsQ.data?.counts ?? []).filter(c => c.folder === f && (catFilter === "all" || c.category === catFilter) && (!selectedAccountId || c.accountId === selectedAccountId)).reduce((s, c) => s + c.unread, 0);
   const unreadForAccount = (aid: number) => (countsQ.data?.counts ?? []).filter(c => c.folder === "inbox" && c.accountId === aid).reduce((s, c) => s + c.unread, 0);
   const folderTotal = (f: Folder) => {
@@ -557,7 +551,7 @@ export function App() {
                   <p className="font-bold text-sm">Profile picture</p>
                   <p className="text-xs text-[var(--dim)] mt-0.5">The face of this inbox — shown on the profile, in the header, and next to sent emails. You may use a different picture for each Work, Personal, and Professional account.</p>
                   <div className="flex gap-2 mt-2 flex-wrap">
-                    <label className="px-3 py-1.5 rounded-full bg-[#EA580C] text-white text-[13px] font-bold cursor-pointer">Upload picture<input aria-label="Upload profile picture" type="file" accept="image/png,image/jpeg,image/webp,image/gif" className="sr-only" onChange={e => { void handleAvatarFile(accountEdit.id, e.target.files?.[0], !accountEdit.id); e.target.value = ""; }} /></label>
+                    <label className="px-3 py-1.5 rounded-full bg-[#EA580C] text-white text-[13px] font-bold cursor-pointer">Upload picture<input aria-label="Upload profile picture" type="file" accept="image/png,image/jpeg,image/webp,image/gif" className="sr-only" onChange={e => { void handleAvatarFile(accountEdit.id, e.target.files?.[0]); e.target.value = ""; }} /></label>
                     {existing?.avatarUrl && <button aria-label="Remove profile picture" onClick={() => removeAvatarMut.mutate(existing.id)} className="px-3 py-1.5 rounded-full border border-[var(--border)] text-[13px] font-semibold">Remove</button>}
                     {avatarBusy && <span className="text-[13px] text-[var(--dim)]">Uploading…</span>}
                     {!accountEdit.id && <span className="text-[13px] text-[var(--dim)]">Save the account first, then reopen Settings to add its picture.</span>}
